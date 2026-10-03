@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillBridge – Skill Exchange System</title>
+  
+  <!-- Custom Vanilla CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/font/lucide.min.css">
+</head>
+<body>
+
+  <!-- ==================== AUTHENTICATION OVERLAY ==================== -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-card glass-card">
+      <div class="auth-header">
+        <div class="brand-logo">SB</div>
+        <h2 style="font-family: var(--font-display); font-size: 1.5rem; margin-top: 1rem;">SkillBridge Portal</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Peer-to-Peer Skill Exchange System</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tabLogin" class="auth-tab active">Login</button>
+        <button id="tabRegister" class="auth-tab">Register</button>
+      </div>
+
+      <!-- Login View -->
+      <div id="loginView" class="auth-view active">
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="kani@gmail.com or sharmila@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            Sign In to SkillBridge
+          </button>
+          <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+            Seed Accounts:<br>
+            Student: <strong>kani@gmail.com</strong> (pass: password123)<br>
+            Mentor: <strong>sharmila@gmail.com</strong> (pass: password123)
+          </div>
+        </form>
+      </div>
+
+      <!-- Register View -->
+      <div id="registerView" class="auth-view">
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" class="form-control" placeholder="Kani / Sharmila" required>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="user@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label for="regRole">Select Role</label>
+            <select id="regRole" class="form-control" required>
+              <option value="Student">Student</option>
+              <option value="Mentor">Mentor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="form-group">
+            <label for="regTeach">Skills You Know (Comma separated)</label>
+            <input type="text" id="regTeach" class="form-control" placeholder="Java, Data Structures" required>
+          </div>
+          <div class="form-group">
+            <label for="regLearn">Skills You Want to Learn (Comma separated)</label>
+            <input type="text" id="regLearn" class="form-control" placeholder="Python, Web Development" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            Create SkillBridge Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== MAIN SHELL ==================== -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">SB</div>
+        <div class="brand-text">
+          <h1>SkillBridge</h1>
+          <p>Skill Exchange System</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item active" data-view="dashboard">
+            <a href="#dashboard"><i class="lucide-layout-dashboard"></i> Dashboard</a>
+          </li>
+          <li class="nav-item" data-view="exchange">
+            <a href="#exchange"><i class="lucide-arrow-left-right"></i> Skill Exchange</a>
+          </li>
+          <li class="nav-item" data-view="progress">
+            <a href="#progress"><i class="lucide-trending-up"></i> Progress</a>
+          </li>
+          <li class="nav-item" data-view="sessions">
+            <a href="#sessions"><i class="lucide-calendar"></i> Sessions</a>
+          </li>
+          <li class="nav-item" data-view="reports">
+            <a href="#reports"><i class="lucide-bar-chart-3"></i> Reports</a>
+          </li>
+          <li class="nav-item" data-view="settings">
+            <a href="#settings"><i class="lucide-settings"></i> Settings</a>
+          </li>
+          <li class="nav-item" data-view="visualizer" style="margin-top: 1.5rem; border-top: 1px dashed var(--border-glass); padding-top: 0.5rem;">
+            <a href="#visualizer"><i class="lucide-database"></i> MySQL Database</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="user-profile-badge">
+        <div class="profile-avatar" id="navAvatar">U</div>
+        <div class="profile-info">
+          <div class="profile-name" id="navName">Student User</div>
+          <div class="profile-role" id="navRole">Student</div>
+          <button id="logoutBtn" class="logout-btn"><i class="lucide-log-out"></i> Log out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+      <section id="view-dashboard" class="view-panel">
+        <div class="content-header">
+          <div class="header-title">
+            <h2 id="welcomeTitle">Welcome to SkillBridge</h2>
+            <p>Skill exchange platform connecting students and mentors.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-secondary" id="dashRequestBtn"><i class="lucide-arrow-left-right"></i> Request Exchange</button>
+            <button class="btn btn-primary" id="dashBookBtn"><i class="lucide-plus"></i> Schedule Session</button>
+          </div>
+        </div>
+
+        <div class="stats-container">
+          <div class="stat-card glass-card">
+            <div class="stat-icon blue"><i class="lucide-arrow-left-right"></i></div>
+            <div>
+              <div class="stat-value" id="dashActiveExchanges">0</div>
+              <div class="stat-label">Active Exchanges</div>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon green"><i class="lucide-book-open"></i></div>
+            <div>
+              <div class="stat-value" id="statLearningHours">0.0h</div>
+              <div class="stat-label">Learning Hours</div>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon yellow"><i class="lucide-award"></i></div>
+            <div>
+              <div class="stat-value" id="statTeachingHours">0.0h</div>
+              <div class="stat-label">Teaching Hours</div>
+            </div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon red"><i class="lucide-star"></i></div>
+            <div>
+              <div class="stat-value" id="statAvgRating">5.0</div>
+              <div class="stat-label">Skill Rating</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skill Exchange Core Example Showcase Banner -->
+        <div class="section-card glass-card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(16, 185, 129, 0.08)); border: 1px solid var(--primary-glow);">
+          <div class="section-title" style="margin-bottom: 0.75rem;">
+            <span style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+              <i class="lucide-repeat"></i> Core Skill Exchange Workflow
+            </span>
+            <span class="tag tag-teach">Live Simulation</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            <strong>Kani (Student)</strong> knows <em>Java & Data Structures</em> | 
+            <strong>Sharmila (Mentor)</strong> knows <em>Python & Web Development</em>.<br>
+            Kani can request <strong>Python</strong> from Sharmila in exchange for <strong>Java</strong>!
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-glass);">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8;">Kani (Student)</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Teaches: Java (Intermediate), Data Structures (Advanced)</p>
+              <p style="font-size: 0.8rem; color: var(--secondary);">Wants to Learn: Python, Web Development</p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--accent);">
+              <i class="lucide-arrow-left-right"></i>
+            </div>
+            <div style="flex: 1; min-width: 240px; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-glass);">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #4ade80;">sharmila (Mentor)</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Teaches: Python (Beginner), Web Development (Intermediate)</p>
+              <p style="font-size: 0.8rem; color: var(--secondary);">Wants to Learn: Java, Data Structures</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div>
+            <div class="section-card glass-card">
+              <div class="section-title">
+                <span>Recent Skill Exchange Requests</span>
+                <a href="#exchange" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">View All</a>
+              </div>
+              <div class="card-list" id="dashExchangeRequests">
+                <!-- Seeding default exchange requests -->
+              </div>
+            </div>
+
+            <div class="section-card glass-card">
+              <div class="section-title">
+                <span>Upcoming Exchange Sessions</span>
+                <a href="#sessions" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">View All</a>
+              </div>
+              <div class="card-list" id="dashUpcomingSessions">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">No upcoming sessions scheduled.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-card glass-card">
+              <div class="section-title">Available Peers for Skill Exchange</div>
+              <div class="card-list" id="dashRecommendedPeers">
+                <!-- Recommended peers -->
+              </div>
+            </div>
+
+            <div class="section-card glass-card" style="margin-top: 1.5rem;">
+              <div class="section-title">Learning Goal Status</div>
+              <div style="margin-bottom: 1rem;">
+                <div id="goalDisplay" style="font-size: 1rem; font-weight: 600; color: var(--primary); padding: 0.75rem; background: rgba(6, 182, 212, 0.08); border-radius: 8px; border-left: 3px solid var(--primary);">
+                  Learn Python from sharmila
+                </div>
+              </div>
+              <form id="goalForm">
+                <div class="form-group">
+                  <input type="text" id="newGoalInput" class="form-control" placeholder="e.g. Learn Python from sharmila">
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%; font-size: 0.85rem;">Update Goal</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 2. SKILL EXCHANGE VIEW ==================== -->
+      <section id="view-exchange" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>Skill Exchange System</h2>
+            <p>Exchange your skills with mentors and peer students seamlessly.</p>
+          </div>
+          <button class="btn btn-primary" id="openExchangeModalBtn"><i class="lucide-plus"></i> New Exchange Request</button>
+        </div>
+
+        <div class="section-card glass-card" style="margin-bottom: 2rem;">
+          <div class="section-title">Active Skill Exchange Requests</div>
+          <div class="card-list" id="exchangeRequestsList">
+            <!-- Dynamic exchange requests -->
+          </div>
+        </div>
+
+        <div class="section-card glass-card">
+          <div class="section-title">Explore Campus Mentors & Students</div>
+          <div class="card-list" id="exchangePeersList">
+            <!-- Dynamic compatible peer list -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 3. PROGRESS VIEW ==================== -->
+      <section id="view-progress" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>Learning & Exchange Progress</h2>
+            <p>Track your skill proficiency level and completed learning hours.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div style="grid-column: span 2;">
+            <div class="section-card glass-card">
+              <div class="section-title">Skill Mastery & Hours Progress</div>
+              <div id="progressSkillList" class="card-list">
+                <!-- Skill progress bars -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. SESSIONS VIEW ==================== -->
+      <section id="view-sessions" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>Exchange Sessions</h2>
+            <p>Book learning sessions, manage schedule, and complete sessions.</p>
+          </div>
+          <button class="btn btn-primary" id="scheduleBookBtn"><i class="lucide-plus"></i> Book a Session</button>
+        </div>
+
+        <div class="section-card glass-card">
+          <div class="section-title">Booked Learning & Mentoring Sessions</div>
+          <div class="card-list" id="scheduleSessionList">
+            <!-- Session items -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. REPORTS VIEW ==================== -->
+      <section id="view-reports" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>Reports & Performance</h2>
+            <p>Visual statistics of study progress, teaching hours, and feedback logs.</p>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="section-card glass-card chart-card">
+            <div class="section-title">Learning vs Mentoring Hours</div>
+            <canvas id="hoursChart" width="400" height="250"></canvas>
+          </div>
+
+          <div class="section-card glass-card chart-card">
+            <div class="section-title">Peer Ratings & Feedback Reviews</div>
+            <div class="card-list" id="feedbackList">
+              <p style="color: var(--text-muted);">No reviews received yet.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 6. SETTINGS VIEW ==================== -->
+      <section id="view-settings" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>Account & Profile Settings</h2>
+            <p>Manage your user profile details, role (Student/Mentor), and your skill list.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div>
+            <div class="section-card glass-card">
+              <div class="section-title">User Profile Details</div>
+              <form id="settingsProfileForm">
+                <div class="form-group">
+                  <label for="settingsName">Full Name</label>
+                  <input type="text" id="settingsName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="settingsEmail">Email Address</label>
+                  <input type="email" id="settingsEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="settingsRole">Role</label>
+                  <select id="settingsRole" class="form-control" required>
+                    <option value="Student">Student</option>
+                    <option value="Mentor">Mentor</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Profile Changes</button>
+              </form>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-card glass-card">
+              <div class="section-title">
+                <span>My Skill Inventory</span>
+                <button class="btn btn-secondary" id="addSkillBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;"><i class="lucide-plus"></i> Add Skill</button>
+              </div>
+              <div class="card-list" id="settingsSkillList">
+                <!-- User's skills table/list -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 7. DATABASE VISUALIZER VIEW ==================== -->
+      <section id="view-visualizer" class="view-panel hidden">
+        <div class="content-header">
+          <div class="header-title">
+            <h2>MySQL Database Visualizer (<code>skillbridge</code>)</h2>
+            <p>See relational tables in real-time and review the raw SQL query log history.</p>
+          </div>
+          <button class="btn btn-secondary" id="resetDbBtn" style="color: var(--danger);"><i class="lucide-rotate-ccw"></i> Reset DB Schema</button>
+        </div>
+
+        <div class="db-visualizer-container">
+          <div class="db-tables-section">
+            
+            <!-- Users Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Users</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbUsersTable">
+                  <thead>
+                    <tr>
+                      <th>User_ID <span class="pk">(PK)</span></th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Password</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Skills Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Skills</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbSkillsTable">
+                  <thead>
+                    <tr>
+                      <th>Skill_ID <span class="pk">(PK)</span></th>
+                      <th>User_ID <span class="fk">(FK)</span></th>
+                      <th>Skill_Name</th>
+                      <th>Level</th>
+                      <th>Category</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Exchanges Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Exchanges</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbExchangesTable">
+                  <thead>
+                    <tr>
+                      <th>Exchange_ID <span class="pk">(PK)</span></th>
+                      <th>Requester_ID <span class="fk">(FK)</span></th>
+                      <th>Provider_ID <span class="fk">(FK)</span></th>
+                      <th>Requested_Skill</th>
+                      <th>Offered_Skill</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Sessions Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Sessions</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbSessionsTable">
+                  <thead>
+                    <tr>
+                      <th>Session_ID <span class="pk">(PK)</span></th>
+                      <th>User_ID <span class="fk">(FK)</span></th>
+                      <th>Partner_ID <span class="fk">(FK)</span></th>
+                      <th>Skill_Name</th>
+                      <th>Date</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Progress Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Progress</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbProgressTable">
+                  <thead>
+                    <tr>
+                      <th>Progress_ID <span class="pk">(PK)</span></th>
+                      <th>User_ID <span class="fk">(FK)</span></th>
+                      <th>Skill_Name</th>
+                      <th>Hours</th>
+                      <th>Proficiency</th>
+                      <th>Goal_Status</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Feedback Table -->
+            <div class="table-viewer-card glass-card">
+              <div class="table-viewer-header">
+                <h3><i class="lucide-table"></i> Feedback</h3>
+              </div>
+              <div class="table-container">
+                <table class="db-table" id="dbFeedbackTable">
+                  <thead>
+                    <tr>
+                      <th>Feedback_ID <span class="pk">(PK)</span></th>
+                      <th>User_ID <span class="fk">(FK)</span></th>
+                      <th>Session_ID <span class="fk">(FK)</span></th>
+                      <th>Rating</th>
+                      <th>Comments</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Live SQL Log Stream -->
+          <div class="sql-log-section">
+            <div class="sql-log-card glass-card">
+              <div class="sql-log-header">
+                <h3><i class="lucide-terminal"></i> MySQL Query Log</h3>
+                <button class="btn btn-secondary" id="clearLogsBtn" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;">Clear Console</button>
+              </div>
+              <div class="sql-feed" id="sqlLogFeed">
+                <!-- Raw generated SQL operations feed here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ==================== SKILL EXCHANGE MODAL ==================== -->
+  <div class="modal-overlay" id="exchangeModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>Request Skill Exchange</h3>
+        <button class="close-btn" id="closeExchangeModal">&times;</button>
+      </div>
+      <form id="exchangeForm">
+        <div class="form-group">
+          <label for="exchangeProvider">Select Mentor / Peer Student</label>
+          <select id="exchangeProvider" class="form-control" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="exchangeRequestedSkill">Skill You Want to Learn</label>
+          <select id="exchangeRequestedSkill" class="form-control" required>
+            <!-- Populated from chosen partner's skills -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="exchangeOfferedSkill">Skill You Offer in Exchange</label>
+          <select id="exchangeOfferedSkill" class="form-control" required>
+            <!-- Populated from current user's taught skills -->
+          </select>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelExchangeBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Exchange Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== BOOKING MODAL ==================== -->
+  <div class="modal-overlay" id="bookModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>Book Skill Exchange Session</h3>
+        <button class="close-btn" id="closeBookModal">&times;</button>
+      </div>
+      <form id="bookForm">
+        <div class="form-group">
+          <label for="bookPeer">Choose Peer</label>
+          <select id="bookPeer" class="form-control" required>
+            <!-- Dynamically populated matches -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookSkill">Skill to Study</label>
+          <select id="bookSkill" class="form-control" required>
+            <!-- Populated based on chosen peer -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookDate">Date</label>
+          <input type="date" id="bookDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="bookDuration">Duration (Hours)</label>
+          <select id="bookDuration" class="form-control" required>
+            <option value="1">1.0 Hour</option>
+            <option value="1.5">1.5 Hours</option>
+            <option value="2">2.0 Hours</option>
+            <option value="3">3.0 Hours</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelBookBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Schedule Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== ADD SKILL MODAL ==================== -->
+  <div class="modal-overlay" id="skillModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>Add Skill to Inventory</h3>
+        <button class="close-btn" id="closeSkillModal">&times;</button>
+      </div>
+      <form id="skillForm">
+        <div class="form-group">
+          <label for="skillNameInput">Skill Name</label>
+          <input type="text" id="skillNameInput" class="form-control" placeholder="e.g. Java, Python, React" required>
+        </div>
+        <div class="form-group">
+          <label for="skillLevelSelect">Proficiency Level</label>
+          <select id="skillLevelSelect" class="form-control" required>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="skillCategorySelect">Category</label>
+          <select id="skillCategorySelect" class="form-control" required>
+            <option value="Programming">Programming</option>
+            <option value="Development">Development</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Design">Design</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="skillTypeSelect">Skill Type</label>
+          <select id="skillTypeSelect" class="form-control" required>
+            <option value="teach">I Can Teach / Offer</option>
+            <option value="learn">I Want to Learn</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelSkillBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Skill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== COMPLETE & FEEDBACK MODAL ==================== -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <h3>Complete Session & Leave Feedback</h3>
+        <button class="close-btn" id="closeFeedbackModal">&times;</button>
+      </div>
+      <form id="feedbackForm">
+        <input type="hidden" id="feedbackSessionId">
+        
+        <div class="form-group">
+          <label for="feedbackRating">Rate Your Peer Partner (1-5 Stars)</label>
+          <select id="feedbackRating" class="form-control" required>
+            <option value="5">⭐⭐⭐⭐⭐ (5.0 Excellent)</option>
+            <option value="4">⭐⭐⭐⭐ (4.0 Very Good)</option>
+            <option value="3">⭐⭐⭐ (3.0 Good)</option>
+            <option value="2">⭐⭐ (2.0 Fair)</option>
+            <option value="1">⭐ (1.0 Poor)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedbackComments">Review Comments</label>
+          <textarea id="feedbackComments" class="form-control" placeholder="Share your experience learning/teaching with this peer..." required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelFeedbackBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- App Controller module -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
